@@ -1,6 +1,7 @@
 # testes/test_fase2_sr.py
 # Testes básicos para Selective Repeat (SR)
-
+import sys, os
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 import time
 from utils.simulator import UnreliableChannel
 from fase2.sr import SRSender, SRReceiver

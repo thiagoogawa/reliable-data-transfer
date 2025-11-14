@@ -4,6 +4,7 @@
 """Implementação rdt3.0 (rdt2.1 + timer para perdas).
 Remetente usa timeout para retransmitir; receptor igual ao rdt2.1.
 """
+from fase1.rdt21 import RDT21Receiver, RDT21Sender
 import socket
 import threading
 import time

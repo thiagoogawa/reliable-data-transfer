@@ -1,102 +1,138 @@
-"""Implementação rdt2.0 (stop-and-wait, ACK/NAK, checksum) usando UDP local.
-Para facilitar testes usamos sockets UDP em localhost com um UnreliableChannel opcional.
-"""
+# src/fase1/rdt20.py
+
 import socket
 import threading
-import time
-from utils import simulator
-from utils import packet as pkt
+from utils.packet import (
+    pack_rdt20,
+    unpack_rdt20,
+    pack_ack_rdt20,
+    TYPE_ACK,
+    TYPE_NAK,
+    TYPE_DATA,
+    checksum,
+)
+
 
 class RDT20Sender:
-    def __init__(self, local_port, dest_addr, channel: simulator.UnreliableChannel=None):
+    """Sender rdt2.0 (stop-and-wait). Retorna número de retransmissões."""
+
+    def __init__(self, local_port, dest_addr, channel=None, timeout=1.0):
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        self.sock.bind(('localhost', local_port))
+        self.sock.bind(("localhost", local_port))
         self.dest_addr = dest_addr
         self.channel = channel
-        self.lock = threading.Lock()
+        self.timeout = timeout
 
-    def send(self, data: bytes, timeout=2.0):
-        packet = pkt.pack_rdt20(data)
-        retransmissions = 0
+    def send(self, msg):
+        """
+        msg: str ou bytes
+        retorna: número de retransmissões realizadas
+        """
+        # converter str → bytes
+        if isinstance(msg, bytes):
+            data = msg
+        else:
+            data = msg.encode()
+
+        pkt = pack_rdt20(data)
+        retrans = 0
+
         while True:
-            # enviar
+            # --- ENVIO ---
             if self.channel:
-                self.channel.send(packet, self.sock, self.dest_addr)
+                self.channel.send(pkt, self.sock, self.dest_addr)
             else:
-                self.sock.sendto(packet, self.dest_addr)
+                self.sock.sendto(pkt, self.dest_addr)
 
-            # aguardar ack/nak
-            self.sock.settimeout(timeout)
+            # --- AGUARDAR ACK/NAK ---
+            self.sock.settimeout(self.timeout)
             try:
-                resp, _ = self.sock.recvfrom(4096)
+                resp, _ = self.sock.recvfrom(1024)
             except socket.timeout:
-                retransmissions += 1
-                print('[SENDER] Timeout, retransmitindo')
+                retrans += 1
                 continue
 
-            # interpretar
-            if len(resp) >= 1:
-                t = resp[0]
-                if t == pkt.TYPE_ACK:
-                    # sucesso
-                    return retransmissions
-                elif t == pkt.TYPE_NAK:
-                    retransmissions += 1
-                    print('[SENDER] Recebeu NAK, retransmitindo')
-                    continue
-            # Se resposta inválida, retransmitir
-            retransmissions += 1
-            print('[SENDER] Resposta inválida, retransmitindo')
+            # ACK/NAK deve ter exatamente 1 byte
+            if len(resp) != 1:
+                retrans += 1
+                continue
+
+            resp_type = resp[0]
+
+            if resp_type == TYPE_ACK:
+                return retrans  # SUCESSO
+            else:
+                # NAK ou lixo
+                retrans += 1
+                continue
+
+    def close(self):
+        try: self.sock.close()
+        except: pass
+
+
 
 class RDT20Receiver:
-    def __init__(self, local_port, channel: simulator.UnreliableChannel=None):
+    """Receiver rdt2.0: roda em thread, envia ACK/NAK e bufferiza mensagens."""
+
+    def __init__(self, local_port, channel=None):
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        self.sock.bind(('localhost', local_port))
+        self.sock.bind(("localhost", local_port))
         self.channel = channel
-        self.app_buffer = []
+        self.buffer = []
         self.running = True
-        self.thread = threading.Thread(target=self._recv_loop, daemon=True)
+
+        self.thread = threading.Thread(target=self._loop, daemon=True)
         self.thread.start()
 
-    def _recv_loop(self):
+    def _send(self, pkt, addr):
+        """Envia pacote ACK/NAK com ou sem canal."""
+        if self.channel:
+            self.channel.send(pkt, self.sock, addr)
+        else:
+            try:
+                self.sock.sendto(pkt, addr)
+            except:
+                pass
+
+    def _loop(self):
         while self.running:
             try:
-                pkt_data, addr = self.sock.recvfrom(65536)
-            except Exception:
+                pkt_bytes, addr = self.sock.recvfrom(65536)
+            except:
                 continue
-            out = pkt.unpack_rdt20(pkt_data)
-            if out is None:
+
+            unpacked = unpack_rdt20(pkt_bytes)
+
+            # Pacote sem formato válido → NAK
+            if unpacked is None:
+                self._send(pack_ack_rdt20(TYPE_NAK), addr)
                 continue
-            t, chksum, data = out
-            if t != pkt.TYPE_DATA:
+
+            t, chksum, data = unpacked
+
+            # --- DETECÇÃO DE CORRUPÇÃO MAIS FORTE ---
+            # tipo corrompido → NAK
+            if t != TYPE_DATA:
+                self._send(pack_ack_rdt20(TYPE_NAK), addr)
                 continue
-            calc = pkt.checksum(data)
-            if calc != chksum:
-                # enviar NAK
-                nak = pkt.pack_ack_rdt20(pkt.TYPE_NAK)
-                if self.channel:
-                    self.channel.send(nak, self.sock, addr)
-                else:
-                    self.sock.sendto(nak, addr)
-                print('[RECV] Pacote corrompido - NAK enviado')
+
+            # checksum errado → NAK
+            if checksum(data) != chksum:
+                self._send(pack_ack_rdt20(TYPE_NAK), addr)
                 continue
-            # correto
-            self.app_buffer.append(data)
-            ack = pkt.pack_ack_rdt20(pkt.TYPE_ACK)
-            if self.channel:
-                self.channel.send(ack, self.sock, addr)
-            else:
-                self.sock.sendto(ack, addr)
+
+            # --- PACOTE OK ---
+            self.buffer.append(data)
+            self._send(pack_ack_rdt20(TYPE_ACK), addr)
 
     def get_all_messages(self):
-        # retorna lista de bytes
-        buf = self.app_buffer[:]
-        self.app_buffer = []
-        return buf
+        """Retorna lista de bytes entregues e limpa buffer."""
+        msgs = self.buffer[:]
+        self.buffer = []
+        return msgs
 
     def stop(self):
         self.running = False
-        try:
-            self.sock.close()
-        except Exception:
-            pass
+        try: self.sock.close()
+        except: pass

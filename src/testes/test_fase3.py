@@ -1,4 +1,6 @@
 # src/testes/test_fase3.py
+import sys, os
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 import threading
 import time
 from utils.simulator import UnreliableChannel

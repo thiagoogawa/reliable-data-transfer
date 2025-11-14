@@ -4,6 +4,8 @@
 """Script de testes para Fase 1.
 Executa os testes obrigatórios do enunciado.
 """
+import sys, os
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 import time
 import threading
 from utils.simulator import UnreliableChannel
