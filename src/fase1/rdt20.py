@@ -81,6 +81,9 @@ class RDT20Receiver:
         self.channel = channel
         self.buffer = []
         self.running = True
+        self.lock = threading.Lock()
+        self.last_payload = None
+        self.last_checksum = None
 
         self.thread = threading.Thread(target=self._loop, daemon=True)
         self.thread.start()
@@ -123,13 +126,23 @@ class RDT20Receiver:
                 continue
 
             # --- PACOTE OK ---
-            self.buffer.append(data)
+            with self.lock:
+                if chksum == self.last_checksum and data == self.last_payload:
+                    # ACK anterior pode ter sido corrompido; reenvia ACK sem duplicar entrega.
+                    self._send(pack_ack_rdt20(TYPE_ACK), addr)
+                    continue
+
+                self.buffer.append(data)
+                self.last_checksum = chksum
+                self.last_payload = data
+
             self._send(pack_ack_rdt20(TYPE_ACK), addr)
 
     def get_all_messages(self):
         """Retorna lista de bytes entregues e limpa buffer."""
-        msgs = self.buffer[:]
-        self.buffer = []
+        with self.lock:
+            msgs = self.buffer[:]
+            self.buffer = []
         return msgs
 
     def stop(self):
