@@ -9,6 +9,11 @@ Todos os módulos utilizam sockets UDP reais, combinados com um **canal
 não confiável** (`UnreliableChannel`) que adiciona perda, corrupção e
 atraso artificial.
 
+
+https://github.com/user-attachments/assets/67c8a296-16a0-45fb-85b9-a2a54dbc8d00
+
+
+
 ------------------------------------------------------------------------
 
 ## 🧩 Estrutura do Projeto
