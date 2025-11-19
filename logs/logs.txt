@@ -1,0 +1,250 @@
+thiagoogawa@MacBook-Pro-de-Thiago src % python3 -m testes.test_fase1
+
+=== Teste rdt2.0 - canal perfeito ===
+Mensagens recebidas: 10 Retransmissões: 0
+
+=== Teste rdt2.0 - 30% de corrupção ===
+[SIM] Pacote corrompido
+[SIM] Pacote corrompido
+[SIM] Pacote corrompido
+[SIM] Pacote corrompido
+[SIM] Pacote corrompido
+[SIM] Pacote corrompido
+[SIM] Pacote corrompido
+[SIM] Pacote corrompido
+[SIM] Pacote corrompido
+[SIM] Pacote corrompido
+[SIM] Pacote corrompido
+Mensagens recebidas: 10 Retransmissões: 11
+
+=== Teste rdt2.1 - corrupcao DATA 20% e ACKs 20% ===
+[SIM] Pacote corrompido
+[SIM] Pacote corrompido
+[SIM] Pacote corrompido
+[SIM] Pacote corrompido
+[SIM] Pacote corrompido
+[SIM] Pacote corrompido
+[SIM] Pacote corrompido
+[SIM] Pacote corrompido
+[SIM] Pacote corrompido
+Mensagens recebidas: 10 Retransmissões: 6
+
+=== Teste rdt3.0 - perda 15% DATA e 15% ACKs, atraso 50-500ms ===
+[SIM] Pacote perdido
+[SENDER30] Timeout, retransmitindo
+[SIM] Pacote perdido
+[SENDER30] Timeout, retransmitindo
+[SIM] Pacote perdido
+[SENDER30] Timeout, retransmitindo
+[SIM] Pacote perdido
+[SENDER30] Timeout, retransmitindo
+Mensagens recebidas: 10 Retransmissões: 4
+
+Todos os testes da Fase 1 completados com sucesso (asserts passaram)
+thiagoogawa@MacBook-Pro-de-Thiago src % python3 -m testes.test_fase2_sr
+
+=== Teste SR básico - canal perfeito ===
+✓ Dados recebidos corretamente (canal perfeito)
+
+=== Teste SR - canal com perdas 10% e atraso ===
+[SIM] Pacote perdido
+[SIM] Pacote perdido
+[SIM] Pacote perdido
+[SR] Timeout seq=8, retransmitindo
+[SR] Timeout seq=13, retransmitindo
+[SR] Timeout seq=11, retransmitindo
+[SIM] Pacote perdido
+[SIM] Pacote perdido
+[SR] Timeout seq=16, retransmitindo
+[SR] Timeout seq=17, retransmitindo
+[SIM] Pacote perdido
+[SIM] Pacote perdido
+[SIM] Pacote perdido
+[SIM] Pacote perdido
+[SR] Timeout seq=25, retransmitindo
+[SR] Timeout seq=27, retransmitindo
+[SR] Timeout seq=31, retransmitindo
+[SR] Timeout seq=32, retransmitindo
+[SIM] Pacote perdido
+[SIM] Pacote perdido
+[SR] Timeout seq=36, retransmitindo
+[SR] Timeout seq=35, retransmitindo
+✓ Dados recebidos corretamente (tempo 2.36s)
+
+Todos os testes da Fase 2 (SR) passaram com sucesso!
+thiagoogawa@MacBook-Pro-de-Thiago src % python3 -m testes.test_fase3
+
+=== Test: handshake + 10KB transfer ===
+Server got: 10240
+Test finished
+
+=== Test: transfer with simulated loss (20%) ===
+[SIM] Pacote perdido
+[SIM] Pacote perdido
+[SIM] Pacote perdido
+[SIM] Pacote perdido
+[SIM] Pacote perdido
+[SIM] Pacote perdido
+[SIM] Pacote perdido
+[SIM] Pacote perdido
+[SIM] Pacote perdido
+[SIM] Pacote perdido
+[SIM] Pacote perdido
+[SIM] Pacote perdido
+[SIM] Pacote perdido
+[SIM] Pacote perdido
+[SIM] Pacote perdido
+[SIM] Pacote perdido
+[SIM] Pacote perdido
+[SIM] Pacote perdido
+[SIM] Pacote perdido
+[SIM] Pacote perdido
+[SIM] Pacote perdido
+[SIM] Pacote perdido
+[SIM] Pacote perdido
+[SIM] Pacote perdido
+[SIM] Pacote perdido
+[SIM] Pacote perdido
+Server got: 51200
+[SIM] Pacote perdido
+[SIM] Pacote perdido
+[SIM] Pacote perdido
+[SIM] Pacote perdido
+[SIM] Pacote perdido
+[SIM] Pacote perdido
+[SIM] Pacote perdido
+[SIM] Pacote perdido
+[SIM] Pacote perdido
+[SIM] Pacote perdido
+[SIM] Pacote perdido
+[SIM] Pacote perdido
+[SIM] Pacote perdido
+[SIM] Pacote perdido
+[SIM] Pacote perdido
+[SIM] Pacote perdido
+[SIM] Pacote perdido
+[SIM] Pacote perdido
+[SIM] Pacote perdido
+[SIM] Pacote perdido
+[SIM] Pacote perdido
+[SIM] Pacote perdido
+[SIM] Pacote perdido
+[SIM] Pacote perdido
+[SIM] Pacote perdido
+[SIM] Pacote perdido
+[SIM] Pacote perdido
+[SIM] Pacote perdido
+[SIM] Pacote perdido
+[SIM] Pacote perdido
+[SIM] Pacote perdido
+[SIM] Pacote perdido
+[SIM] Pacote perdido
+[SIM] Pacote perdido
+[SIM] Pacote perdido
+[SIM] Pacote perdido
+[SIM] Pacote perdido
+[SIM] Pacote perdido
+[SIM] Pacote perdido
+[SIM] Pacote perdido
+[SIM] Pacote perdido
+[SIM] Pacote perdido
+[SIM] Pacote perdido
+[SIM] Pacote perdido
+[SIM] Pacote perdido
+[SIM] Pacote perdido
+[SIM] Pacote perdido
+[SIM] Pacote perdido
+[SIM] Pacote perdido
+[SIM] Pacote perdido
+[SIM] Pacote perdido
+[SIM] Pacote perdido
+[SIM] Pacote perdido
+[SIM] Pacote perdido
+[SIM] Pacote perdido
+[SIM] Pacote perdido
+[SIM] Pacote perdido
+[SIM] Pacote perdido
+[SIM] Pacote perdido
+[SIM] Pacote perdido
+[SIM] Pacote perdido
+[SIM] Pacote perdido
+[SIM] Pacote perdido
+[SIM] Pacote perdido
+[SIM] Pacote perdido
+[SIM] Pacote perdido
+[SIM] Pacote perdido
+[SIM] Pacote perdido
+[SIM] Pacote perdido
+[SIM] Pacote perdido
+[SIM] Pacote perdido
+[SIM] Pacote perdido
+[SIM] Pacote perdido
+[SIM] Pacote perdido
+[SIM] Pacote perdido
+[SIM] Pacote perdido
+[SIM] Pacote perdido
+[SIM] Pacote perdido
+[SIM] Pacote perdido
+[SIM] Pacote perdido
+[SIM] Pacote perdido
+[SIM] Pacote perdido
+[SIM] Pacote perdido
+[SIM] Pacote perdido
+[SIM] Pacote perdido
+[SIM] Pacote perdido
+[SIM] Pacote perdido
+[SIM] Pacote perdido
+[SIM] Pacote perdido
+[SIM] Pacote perdido
+[SIM] Pacote perdido
+[SIM] Pacote perdido
+[SIM] Pacote perdido
+[SIM] Pacote perdido
+[SIM] Pacote perdido
+[SIM] Pacote perdido
+[SIM] Pacote perdido
+[SIM] Pacote perdido
+[SIM] Pacote perdido
+[SIM] Pacote perdido
+[SIM] Pacote perdido
+[SIM] Pacote perdido
+[SIM] Pacote perdido
+[SIM] Pacote perdido
+[SIM] Pacote perdido
+[SIM] Pacote perdido
+[SIM] Pacote perdido
+[SIM] Pacote perdido
+[SIM] Pacote perdido
+[SIM] Pacote perdido
+[SIM] Pacote perdido
+[SIM] Pacote perdido
+[SIM] Pacote perdido
+[SIM] Pacote perdido
+[SIM] Pacote perdido
+[SIM] Pacote perdido
+[SIM] Pacote perdido
+[SIM] Pacote perdido
+[SIM] Pacote perdido
+[SIM] Pacote perdido
+[SIM] Pacote perdido
+[SIM] Pacote perdido
+[SIM] Pacote perdido
+[SIM] Pacote perdido
+[SIM] Pacote perdido
+[SIM] Pacote perdido
+[SIM] Pacote perdido
+[SIM] Pacote perdido
+[SIM] Pacote perdido
+[SIM] Pacote perdido
+[SIM] Pacote perdido
+[SIM] Pacote perdido
+[SIM] Pacote perdido
+[SIM] Pacote perdido
+[SIM] Pacote perdido
+[SIM] Pacote perdido
+[SIM] Pacote perdido
+[SIM] Pacote perdido
+[SIM] Pacote perdido
+[SIM] Pacote perdido
+Loss test finished
+thiagoogawa@MacBook-Pro-de-Thiago src % 
